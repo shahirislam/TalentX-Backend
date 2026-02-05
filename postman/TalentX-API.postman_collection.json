@@ -1,0 +1,207 @@
+{
+  "info": {
+    "name": "TalentX API",
+    "description": "REST API for TalentX – AI & Data Expert Marketplace. Set `baseUrl` and `firebaseIdToken` in collection variables. Use Firebase ID token for protected requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{firebaseIdToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "firebaseIdToken", "value": "" },
+    { "key": "jobId", "value": "" },
+    { "key": "invitationId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Onboard user",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"role\": \"TALENT\"\n}"
+            },
+            "url": "{{baseUrl}}/users/onboard",
+            "description": "Save/update user profile after Firebase login. Role: EMPLOYER | TALENT"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jobs (Public)",
+      "item": [
+        {
+          "name": "List jobs",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/jobs"
+          }
+        },
+        {
+          "name": "Get job by ID",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/jobs/{{jobId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jobs (Employer)",
+      "item": [
+        {
+          "name": "Create job",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior Data Engineer\",\n  \"companyName\": \"Acme Inc\",\n  \"techStack\": [\"Python\", \"Spark\", \"AWS\"],\n  \"description\": \"Build and maintain data pipelines.\",\n  \"deadline\": \"2025-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": "{{baseUrl}}/jobs",
+            "description": "Requires role: EMPLOYER"
+          }
+        },
+        {
+          "name": "Generate job description (AI)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior Data Engineer\",\n  \"techStack\": [\"Python\", \"Spark\", \"AWS\"]\n}"
+            },
+            "url": "{{baseUrl}}/jobs/generate-jd",
+            "description": "Gemini generates JD. Requires role: EMPLOYER"
+          }
+        },
+        {
+          "name": "List applicants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/jobs/{{jobId}}/applicants",
+            "description": "Applicants for a job. Requires role: EMPLOYER, job must be created by you."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Jobs (Talent)",
+      "item": [
+        {
+          "name": "Apply to job",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/jobs/{{jobId}}/apply",
+            "description": "Apply to a job. Requires role: TALENT. Deadline must not have passed."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Talents (Employer)",
+      "item": [
+        {
+          "name": "Get matched talents for job",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/talents/matched?jobId={{jobId}}",
+            "description": "AI match score for talents vs job. Requires role: EMPLOYER."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Talent",
+      "item": [
+        {
+          "name": "Get matched jobs (AI-ranked feed)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/talent/jobs/matched",
+            "description": "AI-ranked job feed for current talent. Requires role: TALENT."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invitations (Employer)",
+      "item": [
+        {
+          "name": "Create invitation",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": \"{{jobId}}\",\n  \"talentId\": \"<firebase-uid-of-talent>\"\n}"
+            },
+            "url": "{{baseUrl}}/invitations",
+            "description": "Invite a talent to a job. Requires role: EMPLOYER."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invitations (Talent)",
+      "item": [
+        {
+          "name": "List my invitations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/invitations",
+            "description": "Invitations for current user. Requires role: TALENT."
+          }
+        },
+        {
+          "name": "Respond to invitation",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"accepted\"\n}"
+            },
+            "url": "{{baseUrl}}/invitations/{{invitationId}}/respond",
+            "description": "Accept or decline. status: accepted | declined. Requires role: TALENT."
+          }
+        }
+      ]
+    }
+  ]
+}
