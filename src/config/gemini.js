@@ -6,6 +6,8 @@ if (!apiKey) {
 }
 
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
-const model = genAI ? genAI.getGenerativeModel({ model: 'gemini-1.5-flash' }) : null;
+// Use a supported model: gemini-1.5-flash was deprecated; gemini-2.0-flash or gemini-1.5-flash-latest are valid
+const modelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const model = genAI ? genAI.getGenerativeModel({ model: modelName }) : null;
 
 module.exports = { model, hasGemini: !!model };

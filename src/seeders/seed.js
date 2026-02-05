@@ -2,18 +2,28 @@
  * TalentX seed script.
  * Seeds: Employers, Talents (User profiles), and Job posts.
  *
+ * Run from repo root: npm run seed (from TalentX-Backend folder).
+ *
  * Login: Auth is via Firebase. To use seeded users for login:
  * - Option A: In Firebase Console (or Emulator), create users with the same UIDs
  *   as below (employer1Uid, employer2Uid, talent1Uid, talent2Uid).
  * - Option B: Sign up normally in the app, then run POST /users/onboard with
  *   the role; jobs seeded here will still show for any employer who creates jobs.
  */
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../..', '.env') });
+
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const Job = require('../models/Job');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/TalentX';
+if (!process.env.MONGODB_URI) {
+  console.warn('MONGODB_URI not set in .env; using default localhost. Ensure you run seed from TalentX-Backend folder.');
+}
 
 /** If SRV lookup fails (e.g. ECONNREFUSED on querySrv), try standard format with port 27017. */
 function toStandardUri(srvUri) {

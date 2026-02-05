@@ -40,4 +40,31 @@ async function apply(jobId, talentId) {
   return application;
 }
 
-module.exports = { apply };
+async function listByTalent(talentId) {
+  const applications = await Application.find({ talentId })
+    .populate('jobId', 'title companyName deadline')
+    .lean()
+    .sort({ createdAt: -1 });
+  return applications.map((a) => {
+    const pop = a.jobId;
+    return {
+      _id: a._id,
+      id: a._id,
+      jobId: pop?._id ?? a.jobId,
+      talentId: a.talentId,
+      source: a.source,
+      job: pop
+        ? {
+            _id: pop._id,
+            id: pop._id,
+            title: pop.title,
+            company: pop.companyName,
+            companyName: pop.companyName,
+            deadline: pop.deadline,
+          }
+        : null,
+    };
+  });
+}
+
+module.exports = { apply, listByTalent };

@@ -1,4 +1,5 @@
 const talentService = require('../services/talentService');
+const applicationService = require('../services/applicationService');
 
 async function getMatchedTalents(req, res, next) {
   try {
@@ -22,4 +23,22 @@ async function getMatchedJobs(req, res, next) {
   }
 }
 
-module.exports = { getMatchedTalents, getMatchedJobs };
+async function getMyApplications(req, res, next) {
+  try {
+    const applications = await applicationService.listByTalent(req.user.uid);
+    res.json(applications);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getAllTalents(req, res, next) {
+  try {
+    const result = await talentService.listAllTalents();
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getMatchedTalents, getMatchedJobs, getMyApplications, getAllTalents };

@@ -53,4 +53,14 @@ async function getMatchedJobsForTalent(talentUid) {
   return merged;
 }
 
-module.exports = { getMatchedTalents, getMatchedJobsForTalent };
+/** List all users who signed up as TALENT (no limit). */
+async function listAllTalents() {
+  const users = await User.find({ role: 'TALENT' }).sort({ createdAt: -1 }).lean();
+  return users.map((u) => ({
+    talent: { uid: u.uid, name: u.name ?? '', email: u.email ?? '', skills: u.skills ?? [] },
+    talentId: u.uid,
+    talentName: u.name ?? '',
+  }));
+}
+
+module.exports = { getMatchedTalents, getMatchedJobsForTalent, listAllTalents };
